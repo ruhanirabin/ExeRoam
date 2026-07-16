@@ -1,4 +1,4 @@
 *.backup.tsv
 *.7z
-.\apps.tsv
+apps.tsv
 apps - Copy backup.tsv
