@@ -57,6 +57,7 @@ Persistent
 ; Ctrl+F         Toggle favourite
 ; Ctrl+E         Open executable folder
 ; Ctrl+C         Copy expanded executable path
+; F1             Show keyboard shortcuts
 ; F2             Open apps.tsv
 ; F5             Reload apps.tsv
 ; Escape         Hide launcher
@@ -137,14 +138,56 @@ global AppList := LauncherGui.AddListView(
 )
 
 global StatusText := LauncherGui.AddText(
-    "x12 y468 w756 h22",
+    "x12 y468 w632 h22",
     ""
+)
+
+global ShortcutButton := LauncherGui.AddButton(
+    "x656 y464 w112 h28",
+    "? Shortcuts"
+)
+
+global ShortcutGui := Gui(
+    "+Owner" LauncherGui.Hwnd " +AlwaysOnTop -MaximizeBox -MinimizeBox",
+    "ExeRoam Shortcuts"
+)
+ShortcutGui.SetFont("s10", "Segoe UI")
+ShortcutGui.AddText(
+    "x18 y16 w130",
+    "Enter`n"
+    . "Ctrl+Enter`n"
+    . "Ctrl+F`n"
+    . "Ctrl+E`n"
+    . "Ctrl+C`n"
+    . "F2`n"
+    . "F5`n"
+    . "Escape"
+)
+ShortcutGui.AddText(
+    "x148 y16 w220",
+    "Open application`n"
+    . "Open as administrator`n"
+    . "Toggle favourite`n"
+    . "Open application folder`n"
+    . "Copy executable path`n"
+    . "Edit application list`n"
+    . "Reload application list`n"
+    . "Close launcher"
+)
+global ShortcutCloseButton := ShortcutGui.AddButton(
+    "x268 y172 w100 h28 Default",
+    "Close"
 )
 
 LauncherGui.OnEvent("Close", HideLauncher)
 LauncherGui.OnEvent("Escape", HideLauncher)
 SearchBox.OnEvent("Change", FilterApplicationList)
 AppList.OnEvent("DoubleClick", LaunchSelectedNormal)
+ShortcutButton.OnEvent("Click", ShowShortcutHelp)
+ShortcutGui.OnEvent("Close", HideShortcutHelp)
+ShortcutGui.OnEvent("Escape", HideShortcutHelp)
+ShortcutCloseButton.OnEvent("Click", HideShortcutHelp)
+OnMessage(0x0006, ShortcutGuiActivationChanged)
 
 ; Hotkeys are active only while the launcher window is active.
 HotIfWinActive("ahk_id " LauncherGui.Hwnd)
@@ -153,10 +196,16 @@ Hotkey("^Enter", LaunchSelectedAsAdmin)
 Hotkey("^f", ToggleSelectedFavourite)
 Hotkey("^e", OpenSelectedFolder)
 Hotkey("^c", CopySelectedPath)
+Hotkey("F1", ShowShortcutHelp)
 Hotkey("F2", OpenAppsFile)
 Hotkey("F5", ReloadApplicationList)
 Hotkey("Escape", HideLauncher)
 Hotkey("Down", FocusApplicationList)
+HotIfWinActive()
+
+HotIfWinActive("ahk_id " ShortcutGui.Hwnd)
+Hotkey("Enter", HideShortcutHelp)
+Hotkey("Escape", HideShortcutHelp)
 HotIfWinActive()
 
 ; Global launcher hotkey.
@@ -243,7 +292,34 @@ ShowLauncherOnMouseMonitor() {
 
 HideLauncher(*) {
     global LauncherGui
+    HideShortcutHelp()
     LauncherGui.Hide()
+}
+
+ShowShortcutHelp(*) {
+    global LauncherGui, ShortcutGui, ShortcutCloseButton
+
+    ShortcutGui.Show("Hide AutoSize")
+    LauncherGui.GetPos(&LauncherX, &LauncherY, &LauncherWidth, &LauncherHeight)
+    ShortcutGui.GetPos(, , &ShortcutWidth, &ShortcutHeight)
+
+    ShortcutX := LauncherX + ((LauncherWidth - ShortcutWidth) // 2)
+    ShortcutY := LauncherY + ((LauncherHeight - ShortcutHeight) // 2)
+
+    ShortcutGui.Show("x" ShortcutX " y" ShortcutY)
+    ShortcutCloseButton.Focus()
+}
+
+HideShortcutHelp(*) {
+    global ShortcutGui
+    ShortcutGui.Hide()
+}
+
+ShortcutGuiActivationChanged(WParam, LParam, Message, Hwnd) {
+    global ShortcutGui
+
+    if Hwnd = ShortcutGui.Hwnd && (WParam & 0xFFFF) = 0
+        ShortcutGui.Hide()
 }
 
 FocusApplicationList(*) {

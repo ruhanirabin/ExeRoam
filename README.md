@@ -98,6 +98,7 @@ These keys work while the launcher window is active:
 | Ctrl+F | Add or remove the selected application as a favourite |
 | Ctrl+E | Open the selected application's folder |
 | Ctrl+C | Copy the expanded executable path |
+| F1 | Show the keyboard shortcuts window |
 | F2 | Open `apps.tsv` in Notepad |
 | F5 | Reload `apps.tsv` after manual edits |
 | Down Arrow | Move focus from the search box to the application list |

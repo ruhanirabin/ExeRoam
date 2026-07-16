@@ -9,6 +9,7 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Optional launcher centering on the monitor containing the mouse pointer.
+- Non-intrusive shortcuts window available from the footer or with F1.
 
 ### Planned
 
