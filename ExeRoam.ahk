@@ -778,7 +778,7 @@ RenderApplicationList() {
         )
     }
 
-    AppList.ModifyCol(1, 300)
+    AppList.ModifyCol(1, 280)
     AppList.ModifyCol(2, 230)
     AppList.ModifyCol(3, 125)
     AppList.ModifyCol(4, 85)
