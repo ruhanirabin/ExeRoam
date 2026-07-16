@@ -6,6 +6,10 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Optional launcher centering on the monitor containing the mouse pointer.
+
 ### Planned
 
 - Add applications from the tray menu with duplicate-path detection.

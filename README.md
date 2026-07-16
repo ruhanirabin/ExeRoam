@@ -43,7 +43,12 @@ The default global hotkey is Win+Alt+Space:
 ```ini
 [Launcher]
 Hotkey=#!Space
+CenterOnMouseMonitor=1
 ```
+
+Set `CenterOnMouseMonitor` to `1` to center the launcher in the work area of
+the monitor containing the mouse pointer. Set it to `0` to use the default
+Windows/AutoHotkey centering behavior.
 
 AutoHotkey uses these modifier symbols:
 

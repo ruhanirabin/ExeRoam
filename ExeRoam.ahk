@@ -94,6 +94,7 @@ global VisibleApps := []
 global ProgramRoots := []
 global AppsFileModified := ""
 global LauncherHotkey := ""
+global CenterOnMouseMonitor := false
 
 ; Scanner exclusions are loaded from exeroam.ini.
 ; Keeping them outside the script makes compiled builds easier to maintain.
@@ -106,6 +107,7 @@ global ExcludedExecutables := ""
 EnsurePortableFiles()
 ProgramRoots := LoadProgramRoots()
 LauncherHotkey := LoadLauncherHotkey()
+CenterOnMouseMonitor := LoadCenterOnMouseMonitor()
 ExcludedExecutables := LoadExcludedExecutables()
 
 if AppsFileHasEntries()
@@ -201,7 +203,7 @@ ToggleLauncher(*) {
 }
 
 ShowLauncher(*) {
-    global LauncherGui, SearchBox
+    global LauncherGui, SearchBox, CenterOnMouseMonitor
 
     ; Pick up manual TSV edits without reparsing the file on every keypress.
     ReloadIfAppsFileChanged()
@@ -209,8 +211,34 @@ ShowLauncher(*) {
     SearchBox.Value := ""
     RenderApplicationList()
 
-    LauncherGui.Show("w780 h502 Center")
+    if CenterOnMouseMonitor
+        ShowLauncherOnMouseMonitor()
+    else
+        LauncherGui.Show("w780 h502 Center")
+
     SearchBox.Focus()
+}
+
+ShowLauncherOnMouseMonitor() {
+    global LauncherGui
+
+    CoordMode("Mouse", "Screen")
+    MouseGetPos(&MouseX, &MouseY)
+
+    Loop MonitorGetCount() {
+        MonitorGetWorkArea(A_Index, &Left, &Top, &Right, &Bottom)
+
+        if MouseX >= Left && MouseX < Right
+            && MouseY >= Top && MouseY < Bottom {
+            WindowX := Left + ((Right - Left - 780) // 2)
+            WindowY := Top + ((Bottom - Top - 502) // 2)
+            LauncherGui.Show("w780 h502 x" WindowX " y" WindowY)
+            return
+        }
+    }
+
+    ; Fall back safely if Windows does not return a matching monitor.
+    LauncherGui.Show("w780 h502 Center")
 }
 
 HideLauncher(*) {
@@ -239,6 +267,7 @@ EnsurePortableFiles() {
         (
         "[Launcher]`n"
         "Hotkey=#!Space`n"
+        "CenterOnMouseMonitor=1`n"
         "`n"
         "[Scanner]`n"
         "ExcludedExecutables=i)^(unins.*|uninstall.*|setup.*|install.*|update.*|updater.*|crash.*|crashreport.*|report.*|helper.*|service.*|notificationhelper.*|elevate.*)\\.exe$`n"
@@ -319,6 +348,16 @@ LoadLauncherHotkey() {
 
     ; Fall back to Win+Alt+Space if the setting is blank.
     return ConfiguredHotkey != "" ? ConfiguredHotkey : "#!Space"
+}
+
+LoadCenterOnMouseMonitor() {
+    global ConfigFile
+
+    ConfiguredValue := Trim(
+        IniRead(ConfigFile, "Launcher", "CenterOnMouseMonitor", "0")
+    )
+
+    return ConfiguredValue = "1"
 }
 
 LoadExcludedExecutables() {
