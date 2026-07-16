@@ -20,6 +20,10 @@ RunWait(
 
 FileCopy(A_ScriptDir "\VERSION", OutputDirectory "\VERSION", true)
 FileCopy(A_ScriptDir "\exeroam.ini", OutputDirectory "\exeroam.ini", true)
+FileCopy(A_ScriptDir "\README.md", OutputDirectory "\README.md", true)
+FileCopy(A_ScriptDir "\CHANGELOG.md", OutputDirectory "\CHANGELOG.md", true)
+FileCopy(A_ScriptDir "\CREDITS.md", OutputDirectory "\CREDITS.md", true)
+FileCopy(A_ScriptDir "\LICENSE", OutputDirectory "\LICENSE.txt", true)
 
 DistAppsFile := OutputDirectory "\apps.tsv"
 
