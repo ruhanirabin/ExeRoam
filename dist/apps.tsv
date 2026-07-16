@@ -1,0 +1,15 @@
+# ExeRoam application list
+#
+# TAB-SEPARATED COLUMNS:
+# Enabled | Favourite | Name | Aliases | Executable | WorkingDirectory | Arguments | RunCount | LastUsed
+#
+# Enabled/Favourite: 1 = yes, 0 = no
+# Aliases: comma-separated search terms; aliases are not displayed
+# LastUsed: yyyyMMddHHmmss; leave empty for never used
+# Portable paths use {ROOT1}, {ROOT2}, etc. from exeroam.ini
+# Lines beginning with # are ignored.
+# Do not insert literal tabs inside field values.
+# Examples:
+# 1	0	AIMP		{ROOT2}\AIMP\AIMP.exe	{ROOT2}\AIMP		0	
+# 1	0	Autologon64		{ROOT2}\SysInternals\Autologon64.exe	{ROOT2}\SysInternals		1	20260714223759
+# 1	1	Autoruns64		{ROOT2}\SysInternals\Autoruns64.exe	{ROOT2}\SysInternals		0	
