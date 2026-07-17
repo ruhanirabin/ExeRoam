@@ -84,7 +84,7 @@ global AppsFile := ScriptDirectory "\apps.tsv"
 global ConfigFile := ScriptDirectory "\exeroam.ini"
 global VersionFile := ScriptDirectory "\VERSION"
 global AppVersion := LoadAppVersion()
-global AppTitle := "ExeRoam v" AppVersion
+global AppTitle := AppVersion != "" ? "ExeRoam v" AppVersion : "ExeRoam"
 
 ; -----------------------------------------------------------------------------
 ; Runtime state
@@ -179,6 +179,47 @@ global ShortcutCloseButton := ShortcutGui.AddButton(
     "Close"
 )
 
+global AboutGui := Gui(
+    "+Owner" LauncherGui.Hwnd " +AlwaysOnTop -MaximizeBox -MinimizeBox",
+    "About ExeRoam"
+)
+AboutGui.SetFont("s10", "Segoe UI")
+AboutGui.SetFont("s16 Bold")
+AboutGui.AddText("x18 y16 w400", AppTitle)
+AboutGui.SetFont("s10 Norm")
+AboutGui.AddText(
+    "x18 y54 w400",
+    "A fast, portable launcher for executables in configurable folders."
+)
+AboutGui.AddText("x18 y88 w72", "INI file:")
+AboutGui.AddEdit(
+    "x90 y84 w328 h24 ReadOnly",
+    ConfigFile
+)
+AboutGui.AddText("x18 y122 w72", "Apps file:")
+AboutGui.AddEdit(
+    "x90 y118 w328 h24 ReadOnly",
+    AppsFile
+)
+AboutGui.AddLink(
+    "x18 y156 w400",
+    '<a href="https://www.ruhanirabin.com/tools">ruhanirabin.com/tools</a>`n'
+    . '<a href="https://github.com/ruhanirabin/ExeRoam">GitHub</a>'
+)
+AboutGui.AddText(
+    "x18 y192 w400 h48",
+    "Icon: Soni Sokell / Icon-Icons.com (CC v4)`n"
+    . "Scripting library: AutoHotkey v2"
+)
+AboutGui.AddText(
+    "x18 y248 w280",
+    "Copyright (c) 2026 Ruhani Rabin`nLicensed under the MIT License."
+)
+global AboutCloseButton := AboutGui.AddButton(
+    "x318 y252 w100 h28 Default",
+    "Close"
+)
+
 LauncherGui.OnEvent("Close", HideLauncher)
 LauncherGui.OnEvent("Escape", HideLauncher)
 SearchBox.OnEvent("Change", FilterApplicationList)
@@ -188,6 +229,9 @@ ShortcutGui.OnEvent("Close", HideShortcutHelp)
 ShortcutGui.OnEvent("Escape", HideShortcutHelp)
 ShortcutCloseButton.OnEvent("Click", HideShortcutHelp)
 OnMessage(0x0006, ShortcutGuiActivationChanged)
+AboutGui.OnEvent("Close", HideAbout)
+AboutGui.OnEvent("Escape", HideAbout)
+AboutCloseButton.OnEvent("Click", HideAbout)
 
 ; Hotkeys are active only while the launcher window is active.
 HotIfWinActive("ahk_id " LauncherGui.Hwnd)
@@ -228,6 +272,10 @@ A_TrayMenu.Add()
 A_TrayMenu.Add("Reload application list", ReloadApplicationList)
 A_TrayMenu.Add("Validate application paths", ValidateApplicationPaths)
 A_TrayMenu.Add("Force rescan applications", ForceRescanApplications)
+
+A_TrayMenu.Add()
+A_TrayMenu.Add("Add to Startup", AddToStartup)
+A_TrayMenu.Add("About", ShowAbout)
 
 A_TrayMenu.Add()
 A_TrayMenu.Add("Reload script", (*) => Reload())
@@ -315,6 +363,18 @@ HideShortcutHelp(*) {
     ShortcutGui.Hide()
 }
 
+ShowAbout(*) {
+    global AboutGui, AboutCloseButton
+
+    AboutGui.Show("AutoSize Center")
+    AboutCloseButton.Focus()
+}
+
+HideAbout(*) {
+    global AboutGui
+    AboutGui.Hide()
+}
+
 ShortcutGuiActivationChanged(WParam, LParam, Message, Hwnd) {
     global ShortcutGui
 
@@ -362,6 +422,9 @@ EnsurePortableFiles() {
 
 LoadAppVersion() {
     global VersionFile
+
+    if !FileExist(VersionFile)
+        return ""
 
     try Version := Trim(FileRead(VersionFile, "UTF-8"))
     catch Error as Err {
@@ -1190,4 +1253,36 @@ OpenConfigFile(*) {
 OpenLauncherFolder(*) {
     global ScriptDirectory
     Run('explorer.exe "' ScriptDirectory '"')
+}
+
+AddToStartup(*) {
+    global ScriptDirectory
+
+    ShortcutFile := A_Startup "\ExeRoam.lnk"
+
+    if A_IsCompiled {
+        Target := A_ScriptFullPath
+        Arguments := ""
+    } else {
+        Target := A_AhkPath
+        Arguments := '"' A_ScriptFullPath '"'
+    }
+
+    try {
+        if FileExist(ShortcutFile)
+            FileDelete(ShortcutFile)
+
+        FileCreateShortcut(
+            Target,
+            ShortcutFile,
+            ScriptDirectory,
+            Arguments,
+            "Start ExeRoam when signing in to Windows",
+            A_ScriptFullPath
+        )
+
+        TrayTip("ExeRoam", "Added to Windows Startup.", 2)
+    } catch Error as Err {
+        ShowError("Unable to add ExeRoam to Windows Startup.", Err)
+    }
 }

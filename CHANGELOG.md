@@ -10,6 +10,16 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add applications from the tray menu with duplicate-path detection.
 
+## [0.2.9] - 2026-07-17
+
+### Added
+
+- Tray actions to add ExeRoam to Windows Startup and show application details.
+
+### Changed
+
+- The launcher now starts without a version label when `VERSION` is missing.
+
 ## [0.2.2] - 2026-07-16
 
 ### Added
