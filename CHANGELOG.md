@@ -10,7 +10,7 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add applications from the tray menu with duplicate-path detection.
 
-## [0.2.9] - 2026-07-17
+## [0.3.0] - 2026-07-19
 
 ### Added
 
@@ -18,7 +18,8 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- The launcher now starts without a version label when `VERSION` is missing.
+- The launcher now starts with version reading from .exe file metadata.
+- Compiler directives are now added to the source file before compilation.
 
 ## [0.2.2] - 2026-07-16
 
