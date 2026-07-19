@@ -10,6 +10,12 @@ The project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Add applications from the tray menu with duplicate-path detection.
 
+## [0.3.1] - 2026-07-19
+
+### Fixed
+
+- Arrow-key navigation no longer returns to the first application after focus moves from search to the application list.
+
 ## [0.3.0] - 2026-07-19
 
 ### Added

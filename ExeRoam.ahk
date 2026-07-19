@@ -245,8 +245,12 @@ Hotkey("F1", ShowShortcutHelp)
 Hotkey("F2", OpenAppsFile)
 Hotkey("F5", ReloadApplicationList)
 Hotkey("Escape", HideLauncher)
-Hotkey("Down", FocusApplicationList)
 HotIfWinActive()
+
+; Down moves from search results into the list, then returns to native list navigation.
+HotIf(LauncherSearchIsFocused)
+Hotkey("Down", FocusApplicationList)
+HotIf()
 
 HotIfWinActive("ahk_id " ShortcutGui.Hwnd)
 Hotkey("Enter", HideShortcutHelp)
@@ -381,6 +385,13 @@ ShortcutGuiActivationChanged(WParam, LParam, Message, Hwnd) {
 
     if Hwnd = ShortcutGui.Hwnd && (WParam & 0xFFFF) = 0
         ShortcutGui.Hide()
+}
+
+LauncherSearchIsFocused(*) {
+    global LauncherGui, SearchBox
+
+    return WinActive("ahk_id " LauncherGui.Hwnd)
+        && LauncherGui.FocusedCtrl = SearchBox
 }
 
 FocusApplicationList(*) {
