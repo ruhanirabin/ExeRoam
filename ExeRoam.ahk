@@ -1,4 +1,5 @@
-﻿#Requires AutoHotkey v2.0
+﻿
+#Requires AutoHotkey v2.0
 #SingleInstance Force
 Persistent
 
@@ -423,20 +424,28 @@ EnsurePortableFiles() {
 LoadAppVersion() {
     global VersionFile
 
-    if !FileExist(VersionFile)
-        return ""
-
-    try Version := Trim(FileRead(VersionFile, "UTF-8"))
+    try {
+        if A_IsCompiled
+            Version := FileGetVersion(A_ScriptFullPath)
+        else if FileExist(VersionFile)
+            Version := Trim(FileRead(VersionFile, "UTF-8"))
+        else
+            return ""
+    }
     catch Error as Err {
         MsgBox(
-            "Unable to read VERSION.`n`n" Err.Message,
+            "Unable to read version information.`n`n" Err.Message,
             "ExeRoam",
             "Iconx"
         )
         ExitApp()
     }
 
-    if !RegExMatch(Version, "^\d+\.\d+\.\d+$") {
+    VersionPattern := A_IsCompiled
+        ? "^\d+\.\d+\.\d+(?:\.\d+)?$"
+        : "^\d+\.\d+\.\d+$"
+
+    if !RegExMatch(Version, VersionPattern) {
         MsgBox(
             "VERSION must contain a semantic version such as 0.1.0.",
             "ExeRoam",
@@ -444,6 +453,9 @@ LoadAppVersion() {
         )
         ExitApp()
     }
+
+    if A_IsCompiled
+        Version := RegExReplace(Version, "^(\d+\.\d+\.\d+)\.0$", "$1")
 
     return Version
 }
